@@ -7,7 +7,7 @@ const app = express();
 const socketIO = require('socket.io');
 
 // configuración del puerto del servidor
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 3000;
 
 // Ruta a la carpeta public
 app.use(express.static(path.join(__dirname, 'public')));

@@ -1,0 +1,29 @@
+{
+  "name": "soketio",
+  "version": "1.0.0",
+  "description": "web Sokets testing",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/strujillodv/heroku-soket-io.git"
+  },
+  "keywords": [
+    "node",
+    "heroku",
+    "sokets",
+    "io"
+  ],
+  "author": "Sergio Antonio Trujillo del Valle",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/strujillodv/heroku-soket-io/issues"
+  },
+  "homepage": "https://github.com/strujillodv/heroku-soket-io#readme",
+  "dependencies": {
+    "express": "^4.17.2",
+    "socket.io": "^4.4.1"
+  }
+}

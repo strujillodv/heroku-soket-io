@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Testing Web Sockets</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js" integrity="sha512-qTXRIMyZIFb8iQcfjXWCO8+M5Tbc38Qi5WzdPOYZHIlZpzBHG3L3by84BBBOiRGiEb7KKtAOAs5qYdUiZiQNNQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdn.socket.io/4.4.1/socket.io.min.js" integrity="sha384-fKnu0iswBIqkjxrhQCTZ7qlLHOFEgNkRmK2vaO/LbTZSXdJfAu6ewRBdwHPhBo/H" crossorigin="anonymous"></script>
+  <style>
+    .text-example,
+    .text-example:active,
+    .text-example:focus-visible {
+      border: none;
+      background-color: transparent;
+      outline: none;
+    }
+    .border-none {
+      border: none;
+    }
+  </style>
+</head>
+<body class="bg-light">
+  <header>
+    <nav class="navbar navbar-ligth bg-ligth">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/">
+          Formulario de envio
+        </a>
+      </div>
+    </nav>
+  </header>
+
+  <section class="main-container container"><!-- container section -->
+
+    <p id="server-time"></p>
+
+    <div id="form">
+
+      <select id="type" class="form-select form-select-sm mb-4" aria-label=".form-select-sm example">
+        <option selected>Tipo de elemento a Modificar</option>
+        <option value="img">Imagen</option>
+        <option value="video">Video</option>
+      </select>
+     
+
+      <div class="mb-3">
+        <label for="dataResource" class="form-label">Data del elemento</label>
+        <input type="text" class="form-control" id="dataResource" aria-describedby="dataResourceHelp">
+        <div id="dataResourceHelp" class="form-text">Ingrese la url de la imagen o el Id si es un video.</div>
+      </div>
+      <div class="mb-3">
+        <label for="time" class="form-label">Hora de cambio</label>
+        <input type="time" class="form-control" id="timeChange" placeholder="00:00:00 PM" aria-describedby="timeHelp">
+        <div id="emailHelp" class="form-text">Ingrese la url de la nueva imagen.</div>
+      </div>
+
+      <select id="section" class="form-select form-select-sm mb-4" aria-label=".form-select-sm example">
+        <option selected>Sección</option>
+        <option value="1">Uno</option>
+        <option value="2">Dos</option>
+        <option value="3">Tres</option>
+      </select>
+
+      <button id="sendData" class="btn btn-primary">Cambiar imagen</button>
+    </div>
+
+    <section class="mt-4">
+      <h1>Imagenes de prueba</h1>
+      <div class="list-group">
+        <label class="list-group-item border-none">
+          <input class="text-example" type="text" value="https://vader.news/__export/1590587024538/sites/gadgets/img/2020/05/27/naruto-dc00879c6a4831911dfcee78b59e6fbc-1200x800.jpg_1902800913.jpg" id="url1" readonly>
+          Naruto
+          <button onclick="copyClipboard('url1')" class="btn btn-primary">Copiar</button>
+        </label>
+        <label class="list-group-item border-none">
+          <input class="text-example" type="text" value="https://as01.epimg.net/meristation/imagenes/2021/04/08/reportajes/1617868658_605828_1617869565_sumario_normal.jpg" id="url2" readonly>
+          Demon
+          <button onclick="copyClipboard('url2')" class="btn btn-primary">Copiar</button>
+        </label>
+        <label class="list-group-item border-none">
+          <input class="text-example" type="text" value="https://images4.alphacoders.com/227/thumb-1920-227944.jpg" id="url3" readonly>
+          Mirai Nikki
+          <button onclick="copyClipboard('url3')" class="btn btn-primary">Copiar</button>
+        </label>
+      </div>
+    </section>
+    <section class="mt-4">
+      <h1>Videos de prueba</h1>
+      <div class="list-group">
+        <label class="list-group-item border-none">
+          <input class="text-example" type="text" value="DWcJFNfaw9c" id="video1" readonly>
+          <button onclick="copyClipboard('video1')" class="btn btn-primary">Copiar</button>
+        </label>
+        <label class="list-group-item border-none">
+          <input class="text-example" type="text" value="gMtCmxy5Umc" id="video2" readonly>
+          <button onclick="copyClipboard('video2')" class="btn btn-primary">Copiar</button>
+        </label>
+        <label class="list-group-item border-none">
+          <input class="text-example" type="text" value="OdzEqOYgY5U?list=RDMM" id="video3" readonly>
+          <button onclick="copyClipboard('video3')" class="btn btn-primary">Copiar</button>
+        </label>
+      </div>
+    </section>
+
+    <script>
+
+    const socket = io();
+
+    const typeData = document.getElementById("type"),
+        dataResource = document.getElementById("dataResource"),
+        hourInput= document.getElementById("timeChange"),
+        sectionSelect= document.getElementById("section");
+
+      document.getElementById("sendData").addEventListener("click", function(){
+        dataNewElement(typeData, dataResource, hourInput, sectionSelect);
+      });
+
+    // Envio de la informacion
+
+    function dataNewElement(typeData, dataResource, hourInput, sectionSelect) {
+
+    // Validamos que los input contengan datos
+    if(dataResource.value === '') { 
+        alert('Ingrese una url de imagen!');
+        return;
+    }
+    if(hourInput.value == ''){ 
+        alert('Ingrese una hora!');
+        return;
+    }
+
+    // Preprara la informacion que va a enviar
+    const data = {
+        type: typeData.value,
+        dataResource: dataResource.value,
+        hour: hourInput.value,
+        section: sectionSelect.value
+    };
+
+    // envia la informacion
+    socket.emit('data:resource', data);
+
+    console.log('información enviada');
+
+    // Reset de los inputs
+    dataResource.value = ''; 
+    hourInput.value = '';
+
+    }
+
+    function copyClipboard(idElement) {
+
+        // Selecciona el elemento
+        var copyText = document.getElementById(idElement);
+        console.log(idElement)
+        // copea el contenido
+        // copyText.select();
+        // copyText.setSelectionRange(0, 99999); /* For mobile devices */
+
+        // Ejecuta la pi HTML5
+        navigator.clipboard.writeText(copyText.value);
+    }
+    </script>
+  
+  </section> <!-- end container section -->
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
+  
+</body>
+</html>
+  

@@ -132,13 +132,15 @@ const io  = socketIO(server,
 const dateMiliseconds = (time) => {
 
   const dateNow = DateTime.now().setZone("America/Bogota");
-  const timeChange = DateTime.fromFormat("14:50", "hh:mm").setZone(
+  const timeChange = DateTime.fromFormat(time, "hh:mm").setZone(
     "America/Bogota"
   );
 
   const mls =  timeChange.diff(dateNow, "seconds")
     .toFormat("S")
 
+  console.log("hora actual: " + dateNow.toISOTime())
+  console.log("hora cambio: "+ timeChange.toISOTime())
   return mls
 }
 

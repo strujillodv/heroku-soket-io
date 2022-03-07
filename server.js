@@ -24,12 +24,12 @@ let banners = [
   {
     id: 0,
     link: '#',
-    imgUrl: 'https://img.freepik.com/free-photo/surface-texture-deck-table-wallpaper_1253-749.jpg?w=826'
+    imgUrl: 'https://cdn.pixabay.com/photo/2016/05/27/08/51/mobile-phone-1419275_960_720.jpg'
   },
   {
     id: 1,
     link: '#',
-    imgUrl: 'https://img.freepik.com/free-photo/creative-black-friday-composition-with-copy-space_23-2148665642.jpg?w=900'
+    imgUrl: 'https://cdn.pixabay.com/photo/2018/07/28/11/08/guitar-3567767_960_720.jpg'
   }
 ]
 
@@ -131,8 +131,12 @@ const io  = socketIO(server,
 
 const dateMiliseconds = (time) => {
 
-  const mls =  DateTime.fromFormat(time, "hh:mm")
-        .diff(DateTime.now(), "seconds")
+  const dateNow = DateTime.now().setZone("America/Bogota");
+  const timeChange = DateTime.fromFormat("14:50", "hh:mm").setZone(
+    "America/Bogota"
+  );
+
+  const mls =  timeChange.diff(dateNow, "seconds")
     .toFormat("S")
 
   return mls

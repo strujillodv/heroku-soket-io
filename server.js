@@ -134,7 +134,7 @@ const dateMiliseconds = (time) => {
   const dateNow = DateTime.now().setZone("America/Bogota");
   const timeChange = DateTime.fromFormat(time, "hh:mm").setZone(
     "America/Bogota"
-  );
+  ).plus({ Hours: 5 });
 
   const mls =  timeChange.diff(dateNow, "seconds")
     .toFormat("S")
